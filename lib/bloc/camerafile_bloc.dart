@@ -2,8 +2,10 @@ import 'dart:io';
 
 import 'package:bloc/bloc.dart';
 import 'package:camera/camera.dart';
+import 'package:camera_pamlanjut/storage_helper_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:meta/meta.dart';
 
@@ -19,7 +21,7 @@ class CamerafileBloc extends Bloc<CamerafileEvent, CamerafileState> {
     on<ToggleFlash>(_onToggleFlash);
     on<TakePicture>(_onTakePicture);
     on<TapToFocus>(_onTapToFocus);
-    on<PickGallery>(_onPickGallery);
+    on<PickImageFromGallery>(_onPickGallery);
     on<OpenCameraAndCapture>(_onOpenCamera);
     on<DeleteImage>(_onDeleteImage);
     on<ClearSnackbar>(_onClearSnackbar);
@@ -91,4 +93,48 @@ class CamerafileBloc extends Bloc<CamerafileEvent, CamerafileState> {
       ));
   }
 
+  Future<void> _onOpenCamera(
+    OpenCameraAndCapture event,
+    Emitter<CamerafileState> emit,
+  ) async {
+    print('[CameraBloc] OpenCameraAndCapture triggered!');
+    if (state is! CameraReady) {
+      print('[CameraBloc] state is not ready, abort!');
+      return;
+    }
+
+    final file = await Navigator.push<File?>(
+      event.context,
+      MaterialPageRoute(
+        builder: (_) => BlocProvider.value(
+          value: this,
+          child: CameraPage(),
+        ),
+      ),
+    );
+
+    if (file != null) {
+      final saved = await StorageHelperBloc.saveImage(file, 'camera');
+      emit((state as CameraReady).copyWith(
+        imageFile: saved,
+        snackbarMessage: 'Disimpan: ${saved.path}',
+      ));
+    }
+  }
+
+  Future<void> _onDeleteImage(
+    DeleteImage event,
+    Emitter<CamerafileState> emit,
+  ) async {
+    if (state is! CameraReady) return;
+    final s = state as CameraReady;
+    await s.imageFile?.delete();
+    emit(CameraReady(
+      controller: s.controller,
+      selectedIndex: s.selectedIndex,
+      flashMode: s.flashMode,
+      imageFile: null,
+      snackbarMessage: 'Gambar dihapus',
+    ));
+  }
 }
