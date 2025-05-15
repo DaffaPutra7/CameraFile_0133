@@ -39,4 +39,29 @@ class CamerafileBloc extends Bloc<CamerafileEvent, CamerafileState> {
     final next = (s.selectedIndex + 1) % _cameras.length;
     await _setupController(emit, next);
   }
+
+  Future<void> _onToggleFlash(
+    ToggleFlash event,
+    Emitter<CamerafileState> emit,
+  ) async {
+    if (state is! CameraReady) return;
+    final s = state as CameraReady;
+    final next = s.flashMode == FlashMode.auto
+        ? FlashMode.always
+        : s.flashMode == FlashMode.always
+            ? FlashMode.off
+            : FlashMode.auto;
+    await s.controller.setFlashMode(next);
+    emit(s.copyWith(flashMode: next));
+  }
+
+  Future<void> _onTakePicture(
+    TakePicture event,
+    Emitter<CamerafileState> emit,
+  ) async {
+    if (state is! CameraReady) return;
+    final s = state as CameraReady;
+    final file = await s.controller.takePicture();
+    emit(s.copyWith(imageFile: File(file.path)));
+  }
 }
