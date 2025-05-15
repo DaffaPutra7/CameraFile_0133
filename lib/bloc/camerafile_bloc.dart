@@ -24,4 +24,19 @@ class CamerafileBloc extends Bloc<CamerafileEvent, CamerafileState> {
     on<ClearSnackbar>(_onClearSnackbar);
     on<RequestPermissions>(_onRequestPermissions);
   }
+
+  Future<void> _onInit(
+    InitializeCamera event,
+    Emitter<CamerafileState> emit,
+  ) async {
+    _cameras = await availableCameras();
+    await _setupController(emit);
+  }
+
+  Future<void> _onSwitch(SwitchCamera event, Emitter<CamerafileState> emit) async {
+    if (state is! CameraReady) return;
+    final s = state as CameraReady;
+    final next = (s.selectedIndex + 1) % _cameras.length;
+    await _setupController(emit, next);
+  }
 }
