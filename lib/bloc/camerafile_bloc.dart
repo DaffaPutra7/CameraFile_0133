@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:bloc/bloc.dart';
+import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:meta/meta.dart';
@@ -9,9 +10,18 @@ part 'camerafile_event.dart';
 part 'camerafile_state.dart';
 
 class CamerafileBloc extends Bloc<CamerafileEvent, CamerafileState> {
+  late final List<CameraDescription> _cameras;
+  
   CamerafileBloc() : super(CamerafileInitial()) {
-    on<CamerafileEvent>((event, emit) {
-      // TODO: implement event handler
-    });
+    on<InitializeCamera>(_onInit);
+    on<SwitchCamera>(_onSwitch);
+    on<ToggleFlash>(_onToggleFlash);
+    on<TakePicture>(_onTakePicture);
+    on<TapToFocus>(_onTapToFocus);
+    on<PickGallery>(_onPickGallery);
+    on<OpenCameraAndCapture>(_onOpenCamera);
+    on<DeleteImage>(_onDeleteImage);
+    on<ClearSnackbar>(_onClearSnackbar);
+    on<RequestPermissions>(_onRequestPermissions);
   }
 }
