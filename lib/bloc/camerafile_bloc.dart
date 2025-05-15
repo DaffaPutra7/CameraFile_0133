@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:bloc/bloc.dart';
 import 'package:camera/camera.dart';
+import 'package:camera_pamlanjut/camera_page_bloc.dart';
 import 'package:camera_pamlanjut/storage_helper_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -109,7 +110,7 @@ class CamerafileBloc extends Bloc<CamerafileEvent, CamerafileState> {
       MaterialPageRoute(
         builder: (_) => BlocProvider.value(
           value: this,
-          child: CameraPage(),
+          child: CameraPageBloc(),
         ),
       ),
     );
