@@ -37,7 +37,7 @@ class _CameraPageBlocState extends State<CameraPageBloc> {
           child: SizedBox(
             width: 50,
             height: 50,
-            child: Icon(icon, color: Colors.white,),
+            child: Icon(icon, color: Colors.white),
           ),
         ),
       ),
@@ -46,6 +46,72 @@ class _CameraPageBlocState extends State<CameraPageBloc> {
 
   @override
   Widget build(BuildContext context) {
-    return const Placeholder();
+    return Scaffold(
+      backgroundColor: Colors.black,
+      body: BlocBuilder<CamerafileBloc, CamerafileState>(
+        builder: (context, state) {
+          if (
+            state is! CameraReady
+          ) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          return LayoutBuilder(
+            builder: (context, constraints) {
+              return Stack(
+                fit: StackFit.expand,
+                children: [
+                  GestureDetector(
+                    onTapDown: (details) {
+                      context.read<CamerafileBloc>().add(
+                        TapToFocus(
+                          details.localPosition, 
+                          constraints.biggest
+                        ),
+                      );
+                    },
+                    child: CameraPreview(state.controller),
+                  ),
+                  Positioned(
+                    top: 50,
+                    right: 20,
+                    child: Column(
+                      children: [
+                        _circleButton(Icons.flip_camera_android, () {
+                          context.read<CamerafileBloc>().add(SwitchCamera());
+                        }),
+                        const SizedBox(height: 12),
+                        _circleButton(_flashIcon(state.flashMode), () {
+                          context.read<CamerafileBloc>().add(ToggleFlash());
+                        }),
+                      ],
+                    ),
+                  ),
+                  Positioned(
+                    bottom: 40,
+                    left: 0,
+                    right: 0,
+                    child: Center(
+                      child: FloatingActionButton(
+                        backgroundColor: Colors.white,
+                        onPressed: () {
+                          context.read<CamerafileBloc>().add(
+                            TakePicture(
+                              (file) => Navigator.pop(context, file)
+                            ),
+                          );
+                        },
+                        child: 
+                            const Icon(Icons.camera_alt, color: Colors.black),
+                      ),
+                    )
+                  )
+                ],
+              );
+            }
+          );
+        },
+      ),
+    );
   }
 }
