@@ -18,3 +18,16 @@ final class TapToFocus extends CamerafileEvent {
   final Size previewSize;
   TapToFocus(this.position, this.previewSize);
 }
+
+final class PickImageFromGallery extends CamerafileEvent {}
+
+final class OpenCameraAndCapture extends CamerafileEvent {
+  final BuildContext context;
+  OpenCameraAndCapture(this.context);
+}
+
+final class DeleteImage extends CamerafileEvent {}
+
+final class ClearSnackbar extends CamerafileEvent {}
+
+final class RequestPermissions extends CamerafileEvent {}
